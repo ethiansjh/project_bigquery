@@ -3,6 +3,10 @@ google-oauth2-tool
 db-dtypes
 google-api-python-client
 google-cloud-bigquery
+<<<<<<< HEAD
 pandas
 sklearn
 XGBoost
+=======
+google-cloud-bigquery-storage
+>>>>>>> 3dea914e4d55e906f8f9a2a413ccc1a82349c7f4
