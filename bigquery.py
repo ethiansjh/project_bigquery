@@ -1,22 +1,41 @@
 from google.cloud import bigquery
 from google.cloud import storage
 
-# connect to api client avec service account key (clé à copier sous le répertoire credentials)
-try:
-    storage_client = storage.Client.from_service_account_json("credentials/devops-practice-449210-bigquery-editor.json")
-    bigquery_client = bigquery.Client.from_service_account_json("credentials/devops-practice-449210-bigquery-editor.json")  
-except Exception as e:
-    print(f"Error connecting to Google Cloud: {e}")
+# connexion à api google cloud par la clé SA (clé à copier sous le répertoire credentials/)
+def gcp_client_auth(key_json_file):
+    try:
+        storage_client = storage.Client.from_service_account_json(key_json_file)
+        bigquery_client = bigquery.Client.from_service_account_json(key_json_file)  
+        return storage_client, bigquery_client
+    except Exception as e:
+        print(f"Error connecting to Google Cloud: {e}")
     exit(1) # Exit with an error code
 
-# Variables.  Make sure these match your project and dataset.
+def get_data_from_bigquery(bigquery_client, table_name):
+    dataset_ref = bigquery.DatasetReference(project, dataset_id)
+    table_ref = dataset_ref.table(table_name)
+    print(table_ref)
+    df = bigquery_client.list_rows(table_ref).to_dataframe()
+    print(df)
+    return df
+
+def push_data_to_storage(storage_client, bucket_name, destination_blob_name, table_name):
+    bucket_name = bucket_name
+    blob_name = table_name + "/" + destination_blob_name
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(destination_blob_name)
+    blob.upload_from_filename(destination_blob_name)
+    print(f"File uploaded to gs://{bucket_name}/{blob_name}")
+
+# Variables, Make sure these match your project and dataset.
+key_json_file = "credentials/devops-practice-449210-bigquery-editor.json"
 project = "devops-practice-449210"
 dataset_id = "project_bigquery"
-table = "Titanic"
+table_name = "Titanic"
+bucket_name = "projectbigquery"
+destination_blob_name = "SpaceShip_Titanic/Spaceship_Titanic_Preprocessed2.csv"
 
-dataset_ref = bigquery.DatasetReference(project, dataset_id)
-table_ref = dataset_ref.table("Titanic")
-table = bigquery_client.get_table(table_ref)
-print(table)
-df = bigquery_client.list_rows(table).to_dataframe()
-print(df)
+# execution des functions
+storage_client, bigquery_client = gcp_client_auth(key_json_file)
+get_data_from_bigquery(bigquery_client, table_name) 
+push_data_to_storage(storage_client, bucket_name, destination_blob_name, table_name)
