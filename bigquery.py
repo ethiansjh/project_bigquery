@@ -11,15 +11,33 @@ def gcp_client_auth(key_json_file):
         print(f"Error connecting to Google Cloud: {e}")
     exit(1) # Exit with an error code
 
-#def import_data_to_bq_from_cs(bigquery_client, table_name):
-#   table_id = f"{project}.{dataset_id}.{table_name}"
+def import_data_to_bq_from_cs(bigquery_client, table_name):
+    job_config = bigquery.LoadJobConfig(
+        schema=[
+            bigquery.SchemaField("name", "STRING"),
+            bigquery.SchemaField("post_abbr", "STRING"),
+        ],
+        skip_leading_rows=1,
+        # The source format defaults to CSV, so the line below is optional.
+        source_format=bigquery.SourceFormat.CSV,
+    )
+    uri = "gs://cloud-samples-data/bigquery/us-states/us-states.csv"
+
+    load_job = client.load_table_from_uri(
+        uri, table_id, job_config=job_config
+    )  # Make an API request.
+
+    load_job.result()  # Waits for the job to complete.
+
+    destination_table = client.get_table(table_id)  # Make an API request.
+    print("Loaded {} rows.".format(destination_table.num_rows))
 
 def get_data_from_bq(bigquery_client, table_name):
     dataset_ref = bigquery.DatasetReference(project, dataset_id)
     table_ref = dataset_ref.table(table_name)
-    print(table_ref)
+    print("Table reference:", table_ref)
     df = bigquery_client.list_rows(table_ref).to_dataframe()
-    print(df)
+    print("Data frame: ", df)
     return df
 
 def push_data_to_cs(storage_client, bucket_name, destination_blob_name, table_name):
@@ -37,7 +55,7 @@ dataset_id = "project_bigquery"
 table_name = "Titanic"
 bucket_name = "projectbigquery"
 raw_data_file_name = "data/train.csv"
-processed_data_file_name = "data/Spaceship_Titanic_Preprocessed2.csv"
+processed_data_file_name = "data/Spaceship_Titanic_Preprocessed.csv"
 
 # gcp client auth
 storage_client, bigquery_client = gcp_client_auth(key_json_file)
@@ -46,7 +64,7 @@ storage_client, bigquery_client = gcp_client_auth(key_json_file)
 push_data_to_cs(storage_client, bucket_name, raw_data_file_name, table_name)
 
 # import data to bq from cs
-import_data_to_bq_from_cs(bigquery_client, table_name)
+#import_data_to_bq_from_cs(bigquery_client, table_name)
 
 # read data from bq
 get_data_from_bq(bigquery_client, table_name)

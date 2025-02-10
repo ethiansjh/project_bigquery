@@ -10,8 +10,8 @@ Créer un notebook pour prototyper la logique d'entrainement, le workflow devra 
 Une fois que votre prototype marche, packager votre code sous forme de fonction
 
 # ML Workflow
-1.Download Raw data (internet)
+1.Download Raw data csv (internet)
 2.Import data to the gcp cloud storage 
-3.Process Data (train) 
-4.Export trained data to Cloud Storage
+3.Process Data (train)
+4.Export trained data to Cloud Storage (pkl, csv)
 5.Read data in Bigquery from Cloud Storage 
