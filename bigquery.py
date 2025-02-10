@@ -1,6 +1,6 @@
 
 from google.cloud import bigquery
-client = bigquery.Client.from_service_account_json("credentials/service-account.json")
+client = bigquery.Client.from_service_account_json("credentials/devops-practice-449210-bigquery-editor.json")
 project = "devops-practice-449210"
 dataset_id = "devops-practice-449210.project_bigquery"
 dataset_ref = bigquery.DatasetReference(project, dataset_id)
