@@ -11,7 +11,10 @@ def gcp_client_auth(key_json_file):
         print(f"Error connecting to Google Cloud: {e}")
     exit(1) # Exit with an error code
 
-def get_data_from_bigquery(bigquery_client, table_name):
+#def import_data_to_bq_from_cs(bigquery_client, table_name):
+#   table_id = f"{project}.{dataset_id}.{table_name}"
+
+def get_data_from_bq(bigquery_client, table_name):
     dataset_ref = bigquery.DatasetReference(project, dataset_id)
     table_ref = dataset_ref.table(table_name)
     print(table_ref)
@@ -19,7 +22,7 @@ def get_data_from_bigquery(bigquery_client, table_name):
     print(df)
     return df
 
-def push_data_to_storage(storage_client, bucket_name, destination_blob_name, table_name):
+def push_data_to_cs(storage_client, bucket_name, destination_blob_name, table_name):
     bucket_name = bucket_name
     blob_name = table_name + "/" + destination_blob_name
     bucket = storage_client.bucket(bucket_name)
@@ -33,9 +36,20 @@ project = "devops-practice-449210"
 dataset_id = "project_bigquery"
 table_name = "Titanic"
 bucket_name = "projectbigquery"
-destination_blob_name = "SpaceShip_Titanic/Spaceship_Titanic_Preprocessed2.csv"
+raw_data_file_name = "data/train.csv"
+processed_data_file_name = "data/Spaceship_Titanic_Preprocessed2.csv"
 
-# execution des functions
+# gcp client auth
 storage_client, bigquery_client = gcp_client_auth(key_json_file)
-get_data_from_bigquery(bigquery_client, table_name) 
-push_data_to_storage(storage_client, bucket_name, destination_blob_name, table_name)
+
+# export raw data to CS
+push_data_to_cs(storage_client, bucket_name, raw_data_file_name, table_name)
+
+# import data to bq from cs
+import_data_to_bq_from_cs(bigquery_client, table_name)
+
+# read data from bq
+get_data_from_bq(bigquery_client, table_name)
+
+# export processed data to CS
+push_data_to_cs(storage_client, bucket_name, processed_data_file_name, table_name)
