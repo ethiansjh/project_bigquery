@@ -9,27 +9,20 @@ def gcp_client_auth(key_json_file):
         return storage_client, bigquery_client
     except Exception as e:
         print(f"Error connecting to Google Cloud: {e}")
-    exit(1) # Exit with an error code
+        exit(1) # Exit with an error code
 
-def import_data_to_bq_from_cs(bigquery_client, table_name, bucket_name, blob_name):
+def import_data_to_bq_from_cs(bigquery_client, table_name, bucket_name, blob_name, table_id):
     job_config = bigquery.LoadJobConfig(
-        schema=[
-            bigquery.SchemaField("name", "STRING"),
-            bigquery.SchemaField("post_abbr", "STRING"),
-        ],
-        skip_leading_rows=1,
-        # The source format defaults to CSV, so the line below is optional.
-        # source_format=bigquery.SourceFormat.CSV,
+    autodetect=True, source_format=bigquery.SourceFormat.CSV, skip_leading_rows=1, write_disposition=bigquery.WriteDisposition.WRITE_APPEND
     )
     uri = "gs://{bucket_name}/{blob_name}"
-
-    load_job = client.load_table_from_uri(
+    # gs://projectbigquery/data/train.csv
+    uri = uri.format(bucket_name=bucket_name, blob_name=blob_name)
+    load_job = bigquery_client.load_table_from_uri(
         uri, table_id, job_config=job_config
     )  # Make an API request.
-
     load_job.result()  # Waits for the job to complete.
-
-    destination_table = client.get_table(table_id)  # Make an API request.
+    destination_table = bigquery_client.get_table(table_id)
     print("Loaded {} rows.".format(destination_table.num_rows))
 
 def get_data_from_bq(bigquery_client, table_name):
@@ -55,19 +48,27 @@ dataset_id = "project_bigquery"
 table_name = "Titanic"
 bucket_name = "projectbigquery"
 raw_data_file_name = "data/train.csv"
+pickle_file_name = "data/model.pkl"
 processed_data_file_name = "data/Spaceship_Titanic_Preprocessed.csv"
+table_id = "devops-practice-449210.project_bigquery.Titanic"
+blob_name = "data/train.csv"
 
 # gcp client auth
 storage_client, bigquery_client = gcp_client_auth(key_json_file)
 
 # export raw data to CS
-push_data_to_cs(storage_client, bucket_name, raw_data_file_name, table_name)
+#push_data_to_cs(storage_client, bucket_name, raw_data_file_name, table_name)
 
 # import data to bq from cs
 #import_data_to_bq_from_cs(bigquery_client, table_name)
 
 # read data from bq
-get_data_from_bq(bigquery_client, table_name)
+#get_data_from_bq(bigquery_client, table_name)
 
 # export processed data to CS
-push_data_to_cs(storage_client, bucket_name, processed_data_file_name, table_name)
+#push_data_to_cs(storage_client, bucket_name, processed_data_file_name, table_name)
+
+# export processed data to CS
+#push_data_to_cs(storage_client, bucket_name, pickle_file_name, table_name)
+
+import_data_to_bq_from_cs(bigquery_client, table_name, bucket_name, blob_name, table_id)
