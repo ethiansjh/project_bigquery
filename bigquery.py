@@ -11,7 +11,7 @@ def gcp_client_auth(key_json_file):
         print(f"Error connecting to Google Cloud: {e}")
     exit(1) # Exit with an error code
 
-def import_data_to_bq_from_cs(bigquery_client, table_name):
+def import_data_to_bq_from_cs(bigquery_client, table_name, bucket_name, blob_name):
     job_config = bigquery.LoadJobConfig(
         schema=[
             bigquery.SchemaField("name", "STRING"),
@@ -19,9 +19,9 @@ def import_data_to_bq_from_cs(bigquery_client, table_name):
         ],
         skip_leading_rows=1,
         # The source format defaults to CSV, so the line below is optional.
-        source_format=bigquery.SourceFormat.CSV,
+        # source_format=bigquery.SourceFormat.CSV,
     )
-    uri = "gs://cloud-samples-data/bigquery/us-states/us-states.csv"
+    uri = "gs://{bucket_name}/{blob_name}"
 
     load_job = client.load_table_from_uri(
         uri, table_id, job_config=job_config

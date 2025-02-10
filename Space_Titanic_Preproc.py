@@ -2,7 +2,7 @@
 # coding: utf-8
 
 import pandas as pd
-df = pd.read_csv('/Users/amandinedeseptenville/code/Tronyque/spaceship_titanic/spaceship-titanic/train.csv', delimiter=',')
+df = pd.read_csv('data/train.csv', delimiter=',')
 
 df.drop(columns=['PassengerId'], inplace=True)
 
@@ -59,9 +59,8 @@ numerical_columns = ['Age', 'RoomService', 'FoodCourt', 'ShoppingMall', 'Spa', '
 # Apply the scaler to the numerical columns
 df[numerical_columns] = scaler.fit_transform(df[numerical_columns])
 
+# transform type to int
 df['Num'] = df['Num'].astype(int)
 
-
-
-
-
+# export data frame to csv
+df.to_csv('data/Spaceship_Titanic_Preprocessed.csv', index=False)

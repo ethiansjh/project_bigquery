@@ -1,5 +1,7 @@
 import pandas as pd
-df = pd.read_csv('/Users/amandinedeseptenville/code/Tronyque/spaceship_titanic/Spaceship_Titanic_Preprocessed2.csv')
+import pickle
+
+df = pd.read_csv('data/Spaceship_Titanic_Preprocessed.csv')
 from sklearn.model_selection import train_test_split
 
 # Define the features and target variable
@@ -33,7 +35,6 @@ rf_best_predictions = best_rf.predict(X_test)
 rf_best_predictions_binary = (rf_best_predictions > 0.5).astype(int)
 
 # Evaluate the model
-
 rf_best_accuracy = accuracy_score(y_test, rf_best_predictions_binary)
 rf_best_mse = mean_squared_error(y_test, rf_best_predictions)
 
@@ -49,3 +50,7 @@ print("\nTest Results:")
 print("Random Forest Test Accuracy: ", rf_best_accuracy)
 print("Random Forest Test Predictions: ", rf_best_predictions_binary)
 
+# Enregistrer le modèle dans un fichier pickle
+print("Exporting model...")
+with open('data/model.pkl', 'wb') as file:
+    pickle.dump(best_rf, file)
