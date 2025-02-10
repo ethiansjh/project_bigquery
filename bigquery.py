@@ -1,29 +1,22 @@
 from google.cloud import bigquery
-from google.oauth2 import service_account
+from google.cloud import storage
 
-key_path = "credentials/devops-practice-449210-bigquery-editor.json"
-credentials = service_account.Credentials.from_service_account_file(
-    key_path,
-    scopes=["https://www.googleapis.com/auth/cloud-platform"],
-)
+# connect to api client avec service account key (clé à copier sous le répertoire credentials)
+try:
+    storage_client = storage.Client.from_service_account_json("credentials/devops-practice-449210-bigquery-editor.json")
+    bigquery_client = bigquery.Client.from_service_account_json("credentials/devops-practice-449210-bigquery-editor.json")  
+except Exception as e:
+    print(f"Error connecting to Google Cloud: {e}")
+    exit(1) # Exit with an error code
 
-client = bigquery.Client(
-    credentials=credentials,
-    project=credentials.project_id,
-)
-
+# Variables.  Make sure these match your project and dataset.
 project = "devops-practice-449210"
 dataset_id = "project_bigquery"
-dataset_ref = bigquery.DatasetReference(project, dataset_id)
-try:
-    table_ref = dataset_ref.table("Titanic")
-    table = client.get_table(table_ref)
-    df = client.list_rows(table).to_dataframe()
-    print(df.head())
-except Exception as e:
-    print(f"An error occurred: {e}")
-    if "Table" in str(e) and "does not exist" in str(e):
-        print("Please create the table 'Titanic' in the specified dataset.")
-    elif "Dataset" in str(e) and "does not exist" in str(e):
-        print("Please create the dataset 'project_bigquery' in the specified project.")
+table = "Titanic"
 
+dataset_ref = bigquery.DatasetReference(project, dataset_id)
+table_ref = dataset_ref.table("Titanic")
+table = bigquery_client.get_table(table_ref)
+print(table)
+df = bigquery_client.list_rows(table).to_dataframe()
+print(df)
