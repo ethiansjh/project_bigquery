@@ -1,1 +1,5 @@
-google.cloud 
+google-cloud
+google-oauth2-tool
+db-dtypes
+google-api-python-client
+google-cloud-bigquery
