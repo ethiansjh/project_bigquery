@@ -1,8 +1,17 @@
-#!/usr/bin/env python
-# coding: utf-8
+import pandas as pd
+df = pd.read_csv('/Users/amandinedeseptenville/code/Tronyque/spaceship_titanic/Spaceship_Titanic_Preprocessed2.csv')
+from sklearn.model_selection import train_test_split
 
+# Define the features and target variable
+X = df.drop('Transported', axis=1)
+y = df['Transported']
 
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+print("Training and testing data split completed.")
 from sklearn.metrics import accuracy_score, mean_squared_error
+from sklearn.ensemble import RandomForestRegressor
 
 # Initialize the RandomForestRegressor with the best parameters
 best_rf = RandomForestRegressor(
@@ -30,9 +39,6 @@ rf_best_mse = mean_squared_error(y_test, rf_best_predictions)
 
 print("Random Forest Best Model Accuracy: ", rf_best_accuracy)
 print("Random Forest Best Model MSE: ", rf_best_mse)
-
-
-
 # Display the results for the training dataset
 print("Training Results:")
 print("Random Forest Training Accuracy: ", rf_best_accuracy)
