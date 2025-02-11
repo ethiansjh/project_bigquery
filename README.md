@@ -16,6 +16,9 @@ La donnée brute avec explications du dataset est ici : https://www.kaggle.com/c
 4. Export trained data to Cloud Storage (pkl, csv)
 5. Read data in Bigquery from Cloud Storage
 
+
+![Mlops workflow](https://github.com/user-attachments/assets/a59e4464-32cb-461b-b3e3-43b8034ebe4b)
+
 # FastAPI
 1. Construire une API avec fastapi (back) pour faire une prédiction avec le model, il faudra loader le modèle depuis GCS !
 3. Construire  un streamlit pour faire une interface graphique sur cette api
