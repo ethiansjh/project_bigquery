@@ -4,4 +4,4 @@ import requests
 import src.Space_Titanic_Preproc as sp
 
 st.header("Titanic Prediction")
-st_dataframe(sp.df)
+st.dataframe(sp.df)
