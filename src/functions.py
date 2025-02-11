@@ -1,5 +1,6 @@
 from google.cloud import bigquery
 from google.cloud import storage
+import os
 
 # connexion à api google cloud par la clé SA (clé à copier sous le répertoire credentials/)
 def gcp_client_auth(key_json_file):
@@ -41,34 +42,23 @@ def push_data_to_cs(storage_client, bucket_name, destination_blob_name, table_na
     blob.upload_from_filename(destination_blob_name)
     print(f"File uploaded to gs://{bucket_name}/{blob_name}")
 
-# Variables, Make sure these match your project and dataset.
+# Clé Json Service Account GCP à mettre dans le dossier credentials
 key_json_file = "credentials/devops-practice-449210-bigquery-editor.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = key_json_file
+
+# GCP static variables
 project = "devops-practice-449210"
 dataset_id = "project_bigquery"
 table_name = "Titanic"
 bucket_name = "projectbigquery"
+table_id = "devops-practice-449210.project_bigquery.Titanic"
+
+# local variables
 raw_data_file_name = "data/train.csv"
 pickle_file_name = "data/model.pkl"
 processed_data_file_name = "data/Spaceship_Titanic_Preprocessed.csv"
-table_id = "devops-practice-449210.project_bigquery.Titanic"
 blob_name = "data/train.csv"
 
 # gcp client auth
-storage_client, bigquery_client = gcp_client_auth(key_json_file)
+# storage_client, bigquery_client = gcp_client_auth(key_json_file)
 
-# export raw data to CS
-#push_data_to_cs(storage_client, bucket_name, raw_data_file_name, table_name)
-
-# import data to bq from cs
-#import_data_to_bq_from_cs(bigquery_client, table_name)
-
-# read data from bq
-#get_data_from_bq(bigquery_client, table_name)
-
-# export processed data to CS
-#push_data_to_cs(storage_client, bucket_name, processed_data_file_name, table_name)
-
-# export processed data to CS
-#push_data_to_cs(storage_client, bucket_name, pickle_file_name, table_name)
-
-import_data_to_bq_from_cs(bigquery_client, table_name, bucket_name, blob_name, table_id)
